@@ -458,6 +458,13 @@ impl Builder {
         self
     }
 
+    //////// 0L ////////
+    pub fn with_release(mut self, release_bundle: ReleaseBundle) -> Self {
+        self.framework = release_bundle;
+        self
+    }
+    //////// end ////////
+
     pub fn with_init_genesis_config(
         mut self,
         init_genesis_config: Option<InitGenesisConfigFn>,
