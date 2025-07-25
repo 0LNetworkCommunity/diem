@@ -22,6 +22,7 @@ const SWARM_BUILD_NUM_RETRIES: u8 = 3;
 #[derive(Clone)]
 pub struct SwarmBuilder {
     local: bool,
+    swarm_dir: Option<String>,
     num_validators: NonZeroUsize,
     num_fullnodes: usize,
     genesis_framework: Option<ReleaseBundle>,
@@ -34,6 +35,7 @@ impl SwarmBuilder {
     pub fn new(local: bool, num_validators: usize) -> Self {
         Self {
             local,
+            swarm_dir: None,
             num_validators: NonZeroUsize::new(num_validators).unwrap(),
             num_fullnodes: 0,
             genesis_framework: None,
@@ -84,19 +86,18 @@ impl SwarmBuilder {
         // TODO change to return Swarm trait
         // Add support for forge
         assert!(self.local);
-        static FACTORY: Lazy<LocalFactory> =
-            Lazy::new(|| LocalFactory::from_workspace(None).unwrap());
-        let version = FACTORY.versions().max().unwrap();
+        let factory = LocalFactory::from_workspace(self.swarm_dir.clone()).unwrap();
+        let version = factory.versions().max().unwrap();
         info!("Node finished compiling");
 
         let slots = self.num_validators.get() * 2;
 
-        static ACTIVE_NODES: Lazy<Arc<Mutex<usize>>> = Lazy::new(|| Arc::new(Mutex::new(0)));
-        let guard = ActiveNodesGuard::grab(slots, ACTIVE_NODES.clone()).await;
+        let active_nodes = Arc::new(Mutex::new(0));
+        let guard = ActiveNodesGuard::grab(slots, active_nodes.clone()).await;
 
         let builder = self.clone();
         let init_genesis_config = builder.init_genesis_config;
-        FACTORY
+        factory
             .new_swarm_with_version(
                 OsRng,
                 builder.num_validators,
@@ -177,9 +178,10 @@ pub async fn new_local_swarm_with_diem(num_validators: usize) -> LocalSwarm {
 //////// 0L ////////
 // third party testsuites need to be able to start a swarm with
 // a pre-compiled move release bundle.
-pub async fn new_local_swarm_with_release(num_validators: usize, release: ReleaseBundle) -> LocalSwarm {
+pub async fn new_local_swarm_with_release(num_validators: usize, release: ReleaseBundle, swarm_dir: Option<String>) -> LocalSwarm {
   let mut sw = SwarmBuilder {
     local: true,
+    swarm_dir,
     num_validators: NonZeroUsize::new(num_validators).unwrap(),
     num_fullnodes: 0,
     genesis_framework: Some(release),
