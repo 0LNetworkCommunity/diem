@@ -125,6 +125,7 @@ impl<U> From<GasQuantity<U>> for u64 {
  * Clone & Copy
  *
  **************************************************************************************************/
+#[allow(clippy::non_canonical_clone_impl)]
 impl<U> Clone for GasQuantity<U> {
     fn clone(&self) -> Self {
         Self::new(self.val)
@@ -167,6 +168,7 @@ impl<U> PartialEq for GasQuantity<U> {
 
 impl<U> Eq for GasQuantity<U> {}
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl<U> PartialOrd for GasQuantity<U> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp_impl(other))

@@ -17,7 +17,8 @@ use std::{
 
 /// TODO(philiphayes): Use `Duration::MAX` once it stabilizes.
 #[inline]
-#[allow(clippy::integer_arithmetic)]
+#[allow(clippy::legacy_numeric_constants)]
+#[allow(clippy::arithmetic_side_effects)]
 fn duration_max() -> Duration {
     Duration::new(std::u64::MAX, 1_000_000_000 - 1)
 }

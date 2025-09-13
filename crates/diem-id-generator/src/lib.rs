@@ -22,6 +22,7 @@ pub struct U32IdGenerator {
     inner: AtomicU32,
 }
 
+#[allow(clippy::new_without_default)]
 impl U32IdGenerator {
     /// Creates a new [`U32IdGenerator`] initialized to `0`
     pub const fn new() -> Self {

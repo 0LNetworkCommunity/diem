@@ -38,7 +38,7 @@ impl<T> Timeouts<T> {
     }
 
     pub(crate) fn expire(&mut self) -> Vec<T> {
-        let cur_time = chrono::Utc::now().naive_utc().timestamp_millis();
+        let cur_time = chrono::Utc::now().naive_utc().and_utc().timestamp_millis();
         trace!(
             "QS: expire cur time {} timeouts len {}",
             cur_time,
